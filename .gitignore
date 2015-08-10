@@ -1,0 +1,6 @@
+
+*.o
+.gz
+TINY_RTMPD.*
+.log*
+./trunk/objs/bin/

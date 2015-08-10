@@ -80,7 +80,7 @@ rtmp_get_options(int argc, char *const *argv)
                 rtmp_show_help = 1;
                 break;
 
-            case 'l':
+            case 'l': //log
                 if (*p) {
                     rtmp_log_file = p;
                     continue;
@@ -94,7 +94,7 @@ rtmp_get_options(int argc, char *const *argv)
                 rtmp_log(RTMP_LOG_ERR, "option \"-l\" requires file name");
                 return RTMP_ERROR;
 
-            case 'c':
+            case 'c': //配置文件
                 if (*p) {
                     rtmp_conf_file = p;
                     continue;
@@ -161,16 +161,26 @@ int main(int argc,char **argv)
 
     rtmp_time_update();
 
-    if (rtmp_log_init(RTMP_LOG_DEBUG,rtmp_log_file) != RTMP_OK) {
+	#ifdef USE_STDOUT
+	//日志等级设置高一点
+	slogi("set log level to DEBUG...");
+	//core里头的log文件的日志级别最高是DEBUG,不使用文件 rtmp_log_file
+    if (rtmp_log_init(RTMP_LOG_DEBUG,"") != RTMP_OK) {
         exit(-1);
     }
+    //rtmp_log(RTMP_LOG_INFO,"test log");
+	#else //使用日志文件
+	 if (rtmp_log_init(RTMP_LOG_INFO,rtmp_log_file) != RTMP_OK) {
+        exit(-1);
+    }
+	#endif
 
     if (rtmp_get_options(argc,argv) != RTMP_OK) {
         exit(-1);
     }
-
+	//add -g to use gdb , b then r then n
     if (rtmp_show_version) {
-        rtmp_log(RTMP_LOG_INFO,"");
+        rtmp_log(RTMP_LOG_INFO,"show version");
 
         if (rtmp_show_help) {
             rtmp_log(RTMP_LOG_INFO,"");
@@ -197,7 +207,7 @@ int main(int argc,char **argv)
         rtmp_log(RTMP_LOG_ERR,"rtmp_init_cycle() failed!");
         return RTMP_FAILED;
     }
-
+	slogi("run cycle...");
     /*run cycle*/
     rtmp_run_cycle(rtmp_cycle);
 
@@ -216,6 +226,7 @@ rtmp_cycle_t* rtmp_init_cycle(void)
     mem_pagesize_shift = 12;
     mem_cacheline_size = 4096;
 
+	//在这里malloc失败啊
     pool = mem_create_pool(MEM_DEFAULT_POOL_SIZE);
     if (pool == NULL) {
         rtmp_log(RTMP_LOG_ERR,"alloc pool failed!");
@@ -263,6 +274,7 @@ rtmp_cycle_t* rtmp_init_cycle(void)
         }
     }
 
+	//没看懂是怎么parse的
     if (rtmp_conf_parse(cycle) != RTMP_OK) {
         return NULL;
     }
@@ -326,6 +338,8 @@ static void rtmp_run_workers_cycle(rtmp_cycle_t * cycle)
 
 static void rtmp_run_master_cycle(rtmp_cycle_t * cycle)
 {
+	slogi("rtmp_run_master_cycle");
+
     uint32_t i;
     pid_t pid;
 
@@ -336,7 +350,7 @@ static void rtmp_run_master_cycle(rtmp_cycle_t * cycle)
             exit(-1);
         }
 
-        if (pid == 0) {
+        if (pid == 0) { //子进程
             rtmp_run_workers_cycle(cycle);
             exit(0);
         }
@@ -349,6 +363,7 @@ static void rtmp_run_master_cycle(rtmp_cycle_t * cycle)
 
 static void rtmp_run_master(rtmp_cycle_t * cycle)
 {
+	slogi("rtmp_run_master");
     for (;;) {
 
     }

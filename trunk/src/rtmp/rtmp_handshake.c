@@ -9,7 +9,7 @@
 
 #include "rtmp_config.h"
 #include "rtmp_core.h"
-
+ #include <openssl/hmac.h> //add by me 
 /*[0,1)[digest][2,3)*/
 #define handshake_make_digest(k,l,d,p)                              \
     do {                                                            \

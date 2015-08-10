@@ -7,7 +7,7 @@
 #include "rtmp_config.h"
 #include "rtmp_core.h"
 
-#define RTMP_LOG_DEFAULT_LEVEL   RTMP_LOG_DEBUG  
+#define RTMP_LOG_DEFAULT_LEVEL   RTMP_LOG_DEBUG
 #define RTMP_LOG_DEFAULT_SIZE    (10*MB)
 
 #define LOG_MAX (RTMP_LOG_DEBUG+1)
@@ -72,11 +72,13 @@ void rtmp_log_core(const char *func,long line, int level,
     }
 
     fp = log_file.fp[level];
-    if (fp == NULL) {
+    if (fp == NULL) {//为空
 
         if (strcmp(log_file.file[level],"") == 0) {
+		//	LOGD("use stdout");
             fp = stdout;
-        } else {
+        } else { //居然跑到了这里,默认有个logs/rtmpd.log
+        //LOGD("log_file.file[level] [%s]",log_file.file[level] );
 
 #ifndef HAVE_OS_WIN32
             int l;
@@ -129,10 +131,12 @@ void rtmp_log_core(const char *func,long line, int level,
 int rtmp_log_init(int level,const char* logname)
 {
     if ((logname) == NULL || (level < 0) || (level >= LOG_MAX)) {
+		LOGE("set log level fail...");
         return RTMP_FAILED;
     }
 
     log_file.level = level;
+	LOGD("level [%d] and log_file.level[%d]",level,log_file.level);
     do {
         strncpy(log_file.file[level],logname,511);
     } while ( --level >= 0);

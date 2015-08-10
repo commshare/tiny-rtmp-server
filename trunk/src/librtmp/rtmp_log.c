@@ -22,7 +22,7 @@ static const char *log_level_string[] = {
 };
 
 static char  log_default_file[256] = "rtmp_core.log";
-static int   log_default_level = RTMP_LOG_ERR;
+static int   log_default_level =RTMP_LOG_MAX /*RTMP_LOG_ERR*/;
 static char  log_str[8000];
 
 void rtmp_log_core(const char *func,long line, int level,
@@ -34,7 +34,7 @@ void rtmp_log_core(const char *func,long line, int level,
     char        ts[128];
     FILE       *fp;
 
-    if (level < RTMP_LOG_ERR || level > log_default_level) {
+    if (level < RTMP_LOG_ERR || level > log_default_level) {//使用MAX作为默认，可以让所有都输出
         return;
     }
 

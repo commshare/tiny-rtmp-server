@@ -108,11 +108,11 @@ int32_t rtmp_amf_cmd_connect(rtmp_session_t *session,rtmp_chunk_header_t *chunk,
             session->sid,conn->vhost);
         return RTMP_FAILED;
     }
-    
+
     rtmp_log(RTMP_LOG_INFO,"[%d]check vhost=\"%s\" found!",
         session->sid,session->host_ctx->name);
 
-    /*find app*/
+    /*find app*///ÔõÃ´Ñ°ÕÒappµÄå
     session->app_ctx = rtmp_app_conf_find(conn->app,&session->host_ctx->apps);
     if (session->app_ctx == NULL) {
         rtmp_log(RTMP_LOG_WARNING,"[%d]check app=\"%s\" not found!",
@@ -172,7 +172,7 @@ int32_t rtmp_amf_parse_connect(rtmp_session_t *session,amf_data_t *amf)
     if (memcmp("rtmp://",conn->tc_url,7) != 0) {
         return RTMP_FAILED;
     }
-    
+
     vhost = mem_dup_str(conn->tc_url+7,session->pool);
     strtok(vhost,":/");
 
@@ -183,7 +183,7 @@ int32_t rtmp_amf_parse_connect(rtmp_session_t *session,amf_data_t *amf)
             break;
         }
     }
-    
+
     conn->vhost = vhost;
     ch = strchr(conn->app,'?');
     if (ch) {
@@ -241,7 +241,7 @@ static uint32_t rtmp_connect_amf_result(rtmp_session_t *session,
     rtmp_chunk_header_t *head)
 {
     amf_data_t          *amf[4],*ecma;
-    mem_buf_t           *buf; 
+    mem_buf_t           *buf;
     mem_buf_chain_t     *chain;
     rtmp_chunk_header_t  hdr;
 

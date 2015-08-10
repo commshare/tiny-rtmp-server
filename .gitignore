@@ -4,3 +4,4 @@
 TINY_RTMPD.*
 .log*
 ./trunk/objs/bin/
+./out/ssl/man/

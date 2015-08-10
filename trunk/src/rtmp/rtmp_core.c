@@ -39,12 +39,12 @@ int32_t rtmp_server_handshake(rtmp_session_t *session)
 
     rev->handler = rtmp_handshake_recv;
     wev->handler = rtmp_handshake_send;
-    
+
     h->stage = RTMP_HANDSHAKE_SERVER_INIT;
     h->rbuf.end = h->rbuf.buf;
 
     rtmp_handshake_recv(rev);
-    
+
     return RTMP_OK;
 }
 
@@ -74,7 +74,7 @@ int32_t rtmp_client_handshake(rtmp_session_t *session)
 void rtmp_core_init_connnect(rtmp_connection_t *conn)
 {
     rtmp_session_t  *session;
-    
+
     session = rtmp_session_create(conn);
     if (session == NULL) {
         rtmp_log(RTMP_LOG_ERR,"[%d]create session error!",conn->fd);
@@ -251,9 +251,9 @@ int32_t rtmp_core_handle_recv(rtmp_session_t *session)
 
         /*an entire chunk ?*/
         recv_len = rbuf->last - payload ;
-        
-        if ((recv_len >= session->in_chunk_size) 
-         || (recv_len + st->recvlen >= st->hdr.msglen)) 
+
+        if ((recv_len >= session->in_chunk_size)
+         || (recv_len + st->recvlen >= st->hdr.msglen))
         {
             if (st->chain == NULL) {
                 st->chain = st->last = session->in_chain;
@@ -276,7 +276,7 @@ int32_t rtmp_core_handle_recv(rtmp_session_t *session)
 
             temp_buf = &session->in_chain->chunk;
             need_len = st->hdr.msglen - st->recvlen;
-            
+
             copy_len = recv_len - rtmp_min(
                 rtmp_min(session->in_chunk_size,recv_len),need_len);
             st->recvlen += recv_len - copy_len;
@@ -293,6 +293,17 @@ int32_t rtmp_core_handle_recv(rtmp_session_t *session)
 
             /*an entire message ?*/
             if (st->recvlen == st->hdr.msglen) {
+				/*
+				[2015-08-10 14:50:45][info][5][0]get a message:[0]:[20]:[99]
+string "connect"
+double 1.000000
+object: [
+[app] : string "live_server"
+[type] : string "nonprivate"
+[tcUrl] : string "rtmp://localhost/live_server"
+[] : ]
+
+				*/
                 rtmp_log(RTMP_LOG_INFO,"[%d][%d]get a message:[%d]:[%d]:[%d]",
                     session->sid,session->chunk_time,st->hdr.msgsid,
                     st->hdr.msgtid,st->hdr.msglen);
@@ -396,7 +407,7 @@ void rtmp_chain_send(rtmp_event_t *ev)
             sbuf = & session->out_chunk->chunk;
 
             if ((session->out_last < sbuf->last)
-             || (session->out_last >= sbuf->end)) 
+             || (session->out_last >= sbuf->end))
             {
                 rtmp_log(RTMP_LOG_WARNING,"[%d]send error chunk",session->sid);
                 session->out_last = sbuf->last;
@@ -441,7 +452,7 @@ void rtmp_chain_send(rtmp_event_t *ev)
         }
 
         chain = session->out_message[out_rear].chain;
-        
+
         rtmp_log(RTMP_LOG_INFO,"[%d]send a message",session->sid);
 
         rtmp_core_free_chain(session,session->chunk_pool,chain);
@@ -449,7 +460,7 @@ void rtmp_chain_send(rtmp_event_t *ev)
         session->out_message[out_rear].chain = NULL;
         session->out_last = NULL;
 
-        session->out_rear = (out_rear + 1) % session->out_queue; 
+        session->out_rear = (out_rear + 1) % session->out_queue;
     }
 
     return ;
@@ -460,7 +471,7 @@ int32_t rtmp_core_handle_message(rtmp_session_t *session,
 {
     rtmp_cycle_t        *cycle;
     rtmp_msg_handler_t **handler;
-    
+
     cycle = session->c->listening->cycle;
     if (chunk->msgtid >= RTMP_MSG_MAX) {
         rtmp_log(RTMP_LOG_WARNING,"unknown message type id:%d",chunk->msgtid);
@@ -521,7 +532,7 @@ int32_t rtmp_core_update_chunk_time(rtmp_session_t *session,
     rtmp_chunk_stream_t *st;
 
     st = session->chunk_streams[h->csid];
-    
+
     /*ignore fragment*/
     if (st->recvlen == 0) {
         switch (st->hdr.fmt) {
@@ -550,7 +561,7 @@ int32_t rtmp_core_update_chunk_time(rtmp_session_t *session,
     return RTMP_OK;
 }
 
-mem_buf_chain_t* rtmp_core_alloc_chain(rtmp_session_t *session, 
+mem_buf_chain_t* rtmp_core_alloc_chain(rtmp_session_t *session,
     mem_pool_t *pool,int32_t chunk_size)
 {
     mem_buf_chain_t *chain;
@@ -640,7 +651,7 @@ mem_buf_t* rtmp_prepare_amf_buffer(mem_pool_t *temp_pool,
     failed = 0;
 
     for (i = 0;i < (int32_t)num; i++) {
-        
+
         if (failed > 10) {
             return NULL;
         }

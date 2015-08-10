@@ -9,11 +9,12 @@
 
 int array_init(array_t *a, mem_pool_t *pool, uint32_t n, size_t size)
 {
-    a->nelts = 0;
+    a->nelts = 0; //代表啥?
     a->size = size;
     a->nalloc = n;
     a->pool = pool;
 
+	//这个又是啥?
     a->elts = mem_palloc(pool, n * size);
     if (a->elts == NULL) {
         return RTMP_ERROR;

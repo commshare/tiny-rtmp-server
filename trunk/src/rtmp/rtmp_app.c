@@ -12,7 +12,7 @@ rtmp_app_t* rtmp_create_app(mem_pool_t *pool,rtmp_host_t *host)
     rtmp_app_t          *app;
     rtmp_app_conf_t     *conf;
     rtmp_host_conf_t    *hconf;
-    
+
     hconf = host->hconf;
     app = mem_pcalloc(pool,sizeof(rtmp_app_t) + sizeof(rtmp_app_conf_t));
     if (app == NULL) {
@@ -31,7 +31,7 @@ rtmp_app_t* rtmp_create_app(mem_pool_t *pool,rtmp_host_t *host)
     conf->ack_size = hconf->ack_size;
     conf->ping_timeout = hconf->ping;
     conf->chunk_size = hconf->chunk_size;
-    conf->stream_buckets = 1024;  
+    conf->stream_buckets = 1024;
 
     list_init(&app->free_lives);
 
@@ -47,6 +47,7 @@ rtmp_app_t *rtmp_app_conf_find(char *name,array_t *a)
 
     app = NULL;
     if ((name == NULL) || (a == NULL) || (a->nelts == 0)) {
+		LOGE("find app fail,return app [%s]",app);
         return app;
     }
 
@@ -97,7 +98,7 @@ rtmp_live_stream_t* rtmp_app_live_alloc(rtmp_app_t *app,
     list_t                  *h;
 
     if (list_empty(&app->free_lives) == 0) {
-        
+
         live = struct_entry(app->free_lives.next,
             rtmp_live_stream_t,link);
 

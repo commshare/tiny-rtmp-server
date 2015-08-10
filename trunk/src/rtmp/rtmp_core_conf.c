@@ -15,7 +15,7 @@ typedef int32_t (*rtmp_host_conf_pt)(rtmp_conf_t *conf,rtmp_host_t *host);
 
 typedef struct rtmp_host_conf_handle_s{
     char               *name;
-    rtmp_host_conf_pt   pt;
+    rtmp_host_conf_pt   pt; //函数指针啊
 }rtmp_host_conf_handle_t;
 
 static int32_t rtmp_parse_ipmask(char *ipmask,rtmp_ip_table_t *ipt);
@@ -60,7 +60,7 @@ int32_t rtmp_host_conf_block(rtmp_cycle_t *c,rtmp_conf_t *conf)
     }
     h = struct_entry(conf->v.next,rtmp_conf_t,v);
 
-    host = mem_pcalloc(c->pool,sizeof(rtmp_host_t) 
+    host = mem_pcalloc(c->pool,sizeof(rtmp_host_t)
         + sizeof(rtmp_host_conf_t));
     if (host == NULL) {
         return RTMP_FAILED;
@@ -79,11 +79,12 @@ int32_t rtmp_host_conf_block(rtmp_cycle_t *c,rtmp_conf_t *conf)
     }
 
     strcpy(host->name,RTMP_HOSTNAME_DEF);
+	//app在这里初始化
     rc = array_init(& host->apps,c->pool,10,sizeof(void**));
     if (rc != RTMP_OK) {
         return RTMP_FAILED;
     }
-    
+
     rc = RTMP_OK;
     next = &h->h;
     do {
@@ -93,9 +94,12 @@ int32_t rtmp_host_conf_block(rtmp_cycle_t *c,rtmp_conf_t *conf)
         }
         word = it->argv.elts;
 
+		/*
+		sizeof((x)[0]) 数组x每个元素的大小
+		*/
         for (i = 0;i < rtmp_array_size(rtmp_host_conf_map);i++) {
             if (strcmp(word[0],rtmp_host_conf_map[i].name) == 0) {
-                rc = rtmp_host_conf_map[i].pt(it,host);
+                rc = rtmp_host_conf_map[i].pt(it,host);//函数指针pt
                 if (rc == RTMP_FAILED) {
                     break;
                 }
@@ -146,6 +150,7 @@ static int32_t rtmp_host_listen_block(rtmp_conf_t *conf,rtmp_host_t *host)
 static int32_t rtmp_host_listen_add(rtmp_host_t *host,
     const char *ip,uint16_t sin_port,int default_server)
 {
+	LOGD("default_server [%d] port[%d]",default_server,sin_port);
     struct sockaddr_in  temp;
     rtmp_addr_port_t   *port;
     rtmp_addr_inet_t   *addr;
@@ -164,10 +169,10 @@ static int32_t rtmp_host_listen_add(rtmp_host_t *host,
     port = (rtmp_addr_port_t *)c->ports.elts;
     for (i = 0;i < (int32_t)c->ports.nelts; i++) {
 
-        if ((port[i].family == temp.sin_family) 
+        if ((port[i].family == temp.sin_family)
             && (port[i].port == temp.sin_port)) {
                 port = & port[i];
-                break; 
+                break;
         }
     }
 
@@ -244,7 +249,7 @@ static int32_t rtmp_host_servername_block(rtmp_conf_t *conf,rtmp_host_t *host)
     rtmp_cycle_t      *c;
     rtmp_host_t      **vhost;
     char             **word;
-    
+
     word = conf->argv.elts;
     if (conf->argv.nelts < 2) {
         return RTMP_FAILED;
@@ -312,6 +317,7 @@ static int32_t rtmp_host_chunksize_block(rtmp_conf_t *conf,rtmp_host_t *host)
 
 static int32_t rtmp_host_app_block(rtmp_conf_t *conf,rtmp_host_t *host)
 {
+	LOGD("host->name [%s]",host->name);
     rtmp_app_t       **app,*app_temp;
     char              *appname,**word;
 
@@ -319,13 +325,15 @@ static int32_t rtmp_host_app_block(rtmp_conf_t *conf,rtmp_host_t *host)
     if (conf->argv.nelts > 1) {
         word = conf->argv.elts;
         appname = word[1];
+		LOGE("word[%s] appname[%s]",word,appname);
     }
 
     /*find app*/
     if (rtmp_app_conf_find(appname,&host->apps)) {
         rtmp_log(RTMP_LOG_WARNING," %s::%s duplicate!",
             host->name,appname);
-    }
+    }else
+        LOGE("rtmp_app_conf_find ##FAIL!");
 
     app_temp = rtmp_create_app(host->cycle->pool,host);
     if (app_temp == NULL) {
@@ -333,6 +341,8 @@ static int32_t rtmp_host_app_block(rtmp_conf_t *conf,rtmp_host_t *host)
         return RTMP_FAILED;
     }
     strncpy(app_temp->name,appname,sizeof(app_temp->name)-1);
+	LOGD("app_temp->name [%s]",app_temp->name);
+
 
     app = array_push(& host->apps);
     if (app == NULL) {
@@ -341,7 +351,7 @@ static int32_t rtmp_host_app_block(rtmp_conf_t *conf,rtmp_host_t *host)
         return RTMP_FAILED;
     }
     *app = app_temp;
-    
+
     if (conf->argv.nelts >= 2) {
         return rtmp_app_conf_block(conf,*app);
     }
@@ -359,7 +369,7 @@ int32_t rtmp_app_conf_block(rtmp_conf_t *conf,rtmp_app_t *app)
 
     host = app->host;
 
-    size = sizeof(list_t) *aconf->stream_buckets;
+    size = sizeof(list_t) *aconf->stream_buckets; //水桶
     app->lives = mem_palloc(host->cycle->pool,size);
 
     if (app->lives == NULL) {

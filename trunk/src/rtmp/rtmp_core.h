@@ -32,13 +32,15 @@
 #include "rtmp_session.h"
 #include "rtmp_connection.h"
 #include "rtmp_handler.h"
+#include "sc_log.h"
+#include "sc_config.h"
 
 struct rtmp_cycle_s {
     mem_pool_t        *pool;
     mem_pool_t        *temp_pool;
     rtmp_conf_t       *conf;
     char              *conf_file;
-        
+
     uint32_t           daemon;
     uint32_t           workers;
     uint32_t           max_conn;
@@ -78,7 +80,7 @@ struct rtmp_module_s{
     void*    (*create_module)(rtmp_cycle_t *cycle);
     int32_t  (*init_cycle)(rtmp_cycle_t *cycle,rtmp_module_t *m);
     int32_t  (*init_forking)(rtmp_cycle_t *cycle,rtmp_module_t *m);
-    int32_t  (*eixt_cycle)(rtmp_cycle_t *cycle,rtmp_module_t *m);
+    int32_t  (*exit_cycle)(rtmp_cycle_t *cycle,rtmp_module_t *m);
 };
 
 rtmp_cycle_t* rtmp_init_cycle();
@@ -90,7 +92,7 @@ int32_t rtmp_client_handshake(rtmp_session_t *session);
 int32_t rtmp_server_handshake_done(rtmp_session_t *session);
 int32_t rtmp_client_handshake_done(rtmp_session_t *session);
 
-mem_buf_chain_t* rtmp_core_alloc_chain(rtmp_session_t *session, 
+mem_buf_chain_t* rtmp_core_alloc_chain(rtmp_session_t *session,
     mem_pool_t *pool,int32_t chunk_size);
 
 void rtmp_core_lock_chain(mem_buf_chain_t *chain);

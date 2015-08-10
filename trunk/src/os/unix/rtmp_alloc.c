@@ -20,9 +20,9 @@ void *mem_alloc(size_t size)
 
     p = malloc(size);
     if (p == NULL) {
-        rtmp_log(RTMP_LOG_WARNING, "malloc(%u) failed", size);
+        //rtmp_log(RTMP_LOG_WARNING, "malloc(%u) failed", size);
+		rtmp_log(RTMP_LOG_DEBUG, "malloc(%u) failed", size);
     }
-    rtmp_log(RTMP_LOG_DEBUG, "malloc(%u) failed", size);
 
     return p;
 }
@@ -31,6 +31,7 @@ void *mem_calloc(size_t size)
 {
     void  *p;
 
+	//·â×°malloc
     p = mem_alloc(size);
 
     if (p) {

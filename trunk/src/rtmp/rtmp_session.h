@@ -15,7 +15,7 @@
 
 typedef struct rtmp_session_connect_s rtmp_session_connect_t;
 struct rtmp_session_connect_s {
-    char    *app;
+    char    *app; //appµÄÃû×Ö
     char    *args;
     char    *flashver;
     char    *swf_url;
@@ -25,12 +25,12 @@ struct rtmp_session_connect_s {
     double   trans;
     double   acodecs;
     double   vcodecs;
-    double   object_encoding; 
+    double   object_encoding;
 };
 
 struct rtmp_session_s {
     uint32_t                sid;                /*session id*/
-    
+
     /*handshake*/
     rtmp_handshake_t       *handshake;
     rtmp_session_connect_t *conn;
@@ -39,7 +39,7 @@ struct rtmp_session_s {
     rtmp_chunk_stream_t   **chunk_streams;
     uint32_t                chunk_time;
     uint32_t                max_streams;
-        
+
     /*lives info*/
     rtmp_live_link_t      **lives;          /*0 is reserved*/
     uint32_t                max_lives;

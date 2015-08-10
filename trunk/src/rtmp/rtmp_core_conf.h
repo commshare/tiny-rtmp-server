@@ -7,11 +7,11 @@
 #define __RTMP_CORE_CONF_H_INCLUDED__
 
 
-#define RTMP_DEFAULT_PORT           1935
+#define RTMP_DEFAULT_PORT           1935 //默认端口号，配置文件里头也有啊
 #define RTMP_DEFAULT_ACK            5000000
 #define RTMP_DEFAULT_PING           5000 /*ms*/
 
-#define RTMP_IPT_TYPE_PUBLISH       0x0001       
+#define RTMP_IPT_TYPE_PUBLISH       0x0001
 #define RTMP_IPT_TYPE_PLAY          0x0002
 
 typedef struct rtmp_app_conf_s  rtmp_app_conf_t;
@@ -33,7 +33,7 @@ struct rtmp_app_conf_s {
     uint32_t            pull:1;
 
     /*0 for play,1 for publish*/
-    link_t              allow_list[2]; 
+    link_t              allow_list[2];
     link_t              deny_list[2];
 
     uint32_t            chunk_size;
